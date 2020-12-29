@@ -1,35 +1,32 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using Microsoft.VisualStudio.Services.Common;
+﻿using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.WebApi;
-using Newtonsoft.Json;
-using ssis.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using MongoDB.Driver;
-
-using System.Threading.Tasks;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson.Serialization;
-using System.Collections;
 
-namespace ssis
+namespace CropsV4
 {
     class Program
     {
         public static void Main(string[] args)
         {
-             //IList<WorkItem> workItems = GetAllWorkItems();
-            System.Text.StringBuilder stringbuilder = new System.Text.StringBuilder(String.Empty);
 
-            DataFromSDK dataFromSDK = new DataFromSDK();
+            const String collectionUri = "https://projects.integrant.com/TFS/BICollection";
+            const String projectName = "TFS Reports";
+            const string token = "vxgwn6lrc6stdf52aem5stdx7hffmc4mt4epubpqcricso3ccmba";
+            //const String collectionUri = "https://dev.azure.com/IPTS-Perspecta";
+            //const String projectName = "IPTS";
+            //const string token = "gbjnuvypldsi4e2rvrk3a2xvahvgccfbzhh4tdjw2usdg6awufma";
 
-            IList<WorkItem> workItems = dataFromSDK.GetAllWorkItems();
+
+
+            WorkItemsFromAzure dataFromSDK = new WorkItemsFromAzure();
+
+            IList<WorkItem> workItems = dataFromSDK.GetAllWorkItems(collectionUri, projectName, token);
             #region BuildingStringforCSV
             /*
+                          //System.Text.StringBuilder stringbuilder = new System.Text.StringBuilder(String.Empty);
             foreach (WorkItem item in workItems)
             {
 
@@ -154,7 +151,6 @@ namespace ssis
             {
                 foreach (var i in item.Fields)
                 {
-
                     if (i.Value.GetType() != typeof(IdentityRef))
                         tempDic.Add(i.Key.ToString().Replace("System", "").Replace(".", ""), i.Value);
                     else

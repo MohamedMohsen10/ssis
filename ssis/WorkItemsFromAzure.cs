@@ -6,34 +6,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ssis
+namespace CropsV4
 {
-    public class DataFromSDK
+    public class WorkItemsFromAzure:ALMDataFromAzureSDK
     {
-
-
-        public IList<WorkItem> GetAllWorkItems()
+        public IList<WorkItem> GetAllWorkItems(string collectionUri, string projectName, string token)
         {
-
-
-            const String collectionUri = "https://projects.integrant.com/TFS/BICollection";
-            const String projectName = "TFS Reports";
-            const string token = "vxgwn6lrc6stdf52aem5stdx7hffmc4mt4epubpqcricso3ccmba";
-
-
-            //const String collectionUri = "https://dev.azure.com/IPTS-Perspecta";
-            //const String projectName = "IPTS";
-            //const string token = "gbjnuvypldsi4e2rvrk3a2xvahvgccfbzhh4tdjw2usdg6awufma";
-
-
             var workItems = GetAllWorkItemsAsyc(collectionUri, projectName, token).Result;
             return workItems;
-
         }
-
-
-
-
         public async Task<IList<WorkItem>> GetAllWorkItemsAsyc(string collectionUri, string project, string token)
         {
 
@@ -55,15 +36,6 @@ namespace ssis
                 var result = await httpClient.QueryByWiqlAsync(wiql).ConfigureAwait(false);
                 int count = 0;
                 List<WorkItem> workItems = new List<WorkItem>();
-
-                //// build a list of the fields we want to see
-                //var fields = new[] { "System.Id", "System.Title", "System.State" ,"System.CommentCount",
-                //    "System.CreatedDate","System.CreatedBy","System.ChangedBy","System.Links.LinkType",
-                //     "Effort","Microsoft.VSTS.Scheduling.StoryPoints","Microsoft.VSTS.Scheduling.OriginalEstimate",
-                //     "Microsoft.VSTS.Scheduling.RemainingWork","Microsoft.VSTS.Scheduling.CompletedWork"
-
-
-                //};
                 foreach (var workItem in result.WorkItems)
                 {
 
@@ -78,16 +50,8 @@ namespace ssis
                     }   
 
                 }
-
-                //ids.Add(66);
-                //workItems.AddRange(await httpClient.GetWorkItemsAsync(ids, fields, result.AsOf).ConfigureAwait(false));
-
                 return workItems;
-                // get work items for the ids found in query
-
-                //    return await httpClient.GetWorkItemsAsync(ids, fields, result.AsOf).ConfigureAwait(false);
             }
         }
-
     }
 }
