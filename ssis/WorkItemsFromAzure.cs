@@ -53,5 +53,15 @@ namespace CropsV4
                 return workItems;
             }
         }
+
+        public IList<WorkItem> GetAllWorkItemsHistory(string collectionUri, string projectName, string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IList<WorkItem>> GetAllWorkItemsHistoryAsyc(string collectionUri, string project, string token)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

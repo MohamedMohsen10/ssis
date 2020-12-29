@@ -145,6 +145,7 @@ namespace CropsV4
             var dbClient = new MongoClient("mongodb://127.0.0.1:27017");
             IMongoDatabase db = dbClient.GetDatabase("Crops_MongoDB");
             var BsonWorkItems = db.GetCollection<BsonDocument>("WorkItems");
+            var BsonWorkItemsHistory = db.GetCollection<BsonDocument>("WorkItemsHistory");
             Dictionary<string,object> tempDic = new Dictionary<string, object>();
             var bsonDoc = new BsonDocument { };
             foreach (var item in workItems)
@@ -161,6 +162,7 @@ namespace CropsV4
                 }
                 bsonDoc.AddRange(tempDic);
                 BsonWorkItems.InsertOne(bsonDoc);
+                BsonWorkItemsHistory.InsertOne(bsonDoc);
                 tempDic.Clear();
                 bsonDoc.Clear();
             }   

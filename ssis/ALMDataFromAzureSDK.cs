@@ -10,5 +10,7 @@ namespace CropsV4
     {
         public IList<WorkItem> GetAllWorkItems(string collectionUri, string projectName, string token);
         public Task<IList<WorkItem>> GetAllWorkItemsAsyc(string collectionUri, string project, string token);
+        public IList<WorkItem> GetAllWorkItemsHistory(string collectionUri, string projectName, string token);
+        public Task<IList<WorkItem>> GetAllWorkItemsHistoryAsyc(string collectionUri, string project, string token);
     }
 }
