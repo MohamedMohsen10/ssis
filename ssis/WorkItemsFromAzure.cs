@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace CropsV4
 {
-    public class WorkItemsFromAzure:ALMDataFromAzureSDK
+    public class WorkItemsFromAzure
     {
-        public IList<WorkItem> GetAllWorkItems(string collectionUri, string projectName, string token)
+        public IList<WorkItem> GetWorkItems(string collectionUri, string projectName, string token)
         {
             var workItems = GetAllWorkItemsAsyc(collectionUri, projectName, token).Result;
             return workItems;
@@ -54,14 +54,11 @@ namespace CropsV4
             }
         }
 
-        public IList<WorkItem> GetAllWorkItemsHistory(string collectionUri, string projectName, string token)
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        public Task<IList<WorkItem>> GetAllWorkItemsHistoryAsyc(string collectionUri, string project, string token)
-        {
-            throw new NotImplementedException();
-        }
+    
+
+        
+        
     }
 }

@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using Microsoft.TeamFoundation.Core.WebApi;
+using Microsoft.TeamFoundation.Work.WebApi;
+using Aspose.Cells.Revisions;
 
 namespace CropsV4
 {
@@ -14,6 +17,7 @@ namespace CropsV4
 
             const String collectionUri = "https://projects.integrant.com/TFS/BICollection";
             const String projectName = "TFS Reports";
+
             const string token = "vxgwn6lrc6stdf52aem5stdx7hffmc4mt4epubpqcricso3ccmba";
             //const String collectionUri = "https://dev.azure.com/IPTS-Perspecta";
             //const String projectName = "IPTS";
@@ -22,8 +26,15 @@ namespace CropsV4
 
 
             WorkItemsFromAzure dataFromSDK = new WorkItemsFromAzure();
-
-            IList<WorkItem> workItems = dataFromSDK.GetAllWorkItems(collectionUri, projectName, token);
+            WorkItemsHistoryFromAzure HistoryFromSDK = new WorkItemsHistoryFromAzure();
+            Projects projectfromSDK = new Projects();
+            Iterations IterationfromSDK = new Iterations();
+            Teams TeamfromSDK = new Teams();
+            List<TeamSettingsIteration> iterations = IterationfromSDK.GetAllIterations(collectionUri, projectName, token);
+            List<WebApiTeam> teams = TeamfromSDK.GetTeams(collectionUri, projectName, token);
+            List<TeamProjectReference> projects = projectfromSDK.ListAllProjectsAndTeams(collectionUri, projectName, token);
+            IList<WorkItem> workItems = dataFromSDK.GetWorkItems(collectionUri, projectName, token);
+            List<WorkItem> workItemsHistory = HistoryFromSDK.GetAllWorkItemsHistory(collectionUri, projectName, token);
             #region BuildingStringforCSV
             /*
                           //System.Text.StringBuilder stringbuilder = new System.Text.StringBuilder(String.Empty);
@@ -146,8 +157,79 @@ namespace CropsV4
             IMongoDatabase db = dbClient.GetDatabase("Crops_MongoDB");
             var BsonWorkItems = db.GetCollection<BsonDocument>("WorkItems");
             var BsonWorkItemsHistory = db.GetCollection<BsonDocument>("WorkItemsHistory");
-            Dictionary<string,object> tempDic = new Dictionary<string, object>();
+            var BsonProject = db.GetCollection<BsonDocument>("projects");
+            var BsonIteration = db.GetCollection<BsonDocument>("Iterations");
+            var BsonTeam = db.GetCollection<BsonDocument>("Teams");
+            Dictionary<string, object> tempDic = new Dictionary<string, object>();
             var bsonDoc = new BsonDocument { };
+            foreach (var item in teams)
+            {
+
+                if (item.Name.GetType() != typeof(IdentityRef))
+                {
+                    tempDic.Add(item.Name.ToString().Replace("System", "").Replace(".", ""), item.Name);
+                    tempDic.Add(item.ProjectId.ToString().Replace("System.", "").Replace(".", "") + "ProjectId", (item.ProjectId));
+
+                }
+                else
+                {
+                    tempDic.Add(item.Id.ToString().Replace("System.", "").Replace(".", "") + "Id", (item.Id));
+
+                    tempDic.Add(item.Name.ToString().Replace("System.", "").Replace(".", "") + "Name", (item.Name));
+
+                    tempDic.Add(item.ProjectName.ToString().Replace("System.", "").Replace(".", "") + "ProjectName", (item.ProjectName));
+
+                }
+                bsonDoc.AddRange(tempDic);
+                BsonTeam.InsertOne(bsonDoc);
+                tempDic.Clear();
+                bsonDoc.Clear();
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////
+            foreach (var item in iterations)
+            {
+                if (item.Name.GetType() != typeof(IdentityRef))
+                {
+                    tempDic.Add(item.Name.ToString().Replace("System", "").Replace(".", "IterationName"), item.Name);
+                    tempDic.Add(item.Path.ToString().Replace("System.", "").Replace(".", "Path") + "path", (item.Path));
+                    tempDic.Add(item.Links.ToString().Replace("System.", "").Replace(".", "Links") + "Links", (item.Links));
+
+                }
+                else
+                {
+                    tempDic.Add(item.Id.ToString().Replace("System.", "").Replace(".", "") + "Id", (item.Id));
+
+                    tempDic.Add(item.Name.ToString().Replace("System.", "").Replace(".", "") + "Name", (item.Name));
+
+                }
+                bsonDoc.AddRange(tempDic);
+                BsonIteration.InsertOne(bsonDoc);
+                tempDic.Clear();
+                bsonDoc.Clear();
+            }
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            foreach (var item in projects)
+            {
+                if (item.Name.GetType() != typeof(IdentityRef))
+                {
+                    tempDic.Add(item.Name.ToString().Replace("System", "").Replace(".", "ProjectName"), item.Name);
+                    tempDic.Add(item.State.ToString().Replace("System", "").Replace(".", "State"), item.State);
+                    tempDic.Add(item.LastUpdateTime.ToString().Replace("System", "LastUpdatedDate").Replace(".", "LastUpdatedDate"), item.LastUpdateTime);
+                    tempDic.Add(item.Url.ToString().Replace("System", "URL").Replace(".", "URL"), item.Url);
+                }
+                else
+                {
+                    tempDic.Add(item.Id.ToString().Replace("System.", "").Replace(".", "") + "Id", (item.Id));
+
+                 
+
+                }
+                bsonDoc.AddRange(tempDic);
+                BsonProject.InsertOne(bsonDoc);
+                tempDic.Clear();
+                bsonDoc.Clear();
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////
             foreach (var item in workItems)
             {
                 foreach (var i in item.Fields)
@@ -157,16 +239,49 @@ namespace CropsV4
                     else
                     {
                         tempDic.Add(i.Key.ToString().Replace("System.", "").Replace(".", "") + "Id", ((IdentityRef)i.Value).Id);
+
                         tempDic.Add(i.Key.ToString().Replace("System.", "").Replace(".", "") + "DisplayName", ((IdentityRef)i.Value).DisplayName);
+
                     }
+                    bsonDoc.AddRange(tempDic);
+                    BsonWorkItems.InsertOne(bsonDoc);
+
+
+                    tempDic.Clear();
+                    bsonDoc.Clear();
                 }
-                bsonDoc.AddRange(tempDic);
-                BsonWorkItems.InsertOne(bsonDoc);
-                BsonWorkItemsHistory.InsertOne(bsonDoc);
-                tempDic.Clear();
-                bsonDoc.Clear();
-            }   
-            Console.WriteLine("Done");
+            }
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+                foreach (var item in workItemsHistory)
+                {
+                    foreach (var i in item.Fields)
+                    {
+                  
+
+                        if (i.Value.GetType() != typeof(IdentityRef))
+                            tempDic.Add(i.Key.ToString().Replace("System", "").Replace(".", ""), i.Value);
+                        else
+                        {
+                            tempDic.Add(i.Key.ToString().Replace("System.", "").Replace(".", "") + "Id", ((IdentityRef)i.Value).Id);
+
+                            tempDic.Add(i.Key.ToString().Replace("System.", "").Replace(".", "") + "DisplayName", ((IdentityRef)i.Value));
+
+                        }
+                    
+                    bsonDoc.AddRange(tempDic);
+
+                        BsonWorkItemsHistory.InsertOne(bsonDoc);
+
+                        tempDic.Clear();
+                        bsonDoc.Clear();
+                    }
+                
+                    Console.WriteLine("Done");
+
+                }
+
+
+            
         }
     }
 }
