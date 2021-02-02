@@ -167,17 +167,18 @@ namespace CropsV4
 
                 if (item.Name.GetType() != typeof(IdentityRef))
                 {
-                    tempDic.Add(item.Name.ToString().Replace("System", "").Replace(".", ""), item.Name);
-                    tempDic.Add(item.ProjectId.ToString().Replace("System.", "").Replace(".", "") + "ProjectId", (item.ProjectId));
+                    tempDic.Add("TeamName", item.Name);
+                    tempDic.Add("ProjectId",item.ProjectId);
+                    tempDic.Add("ProjectName", item.ProjectName);
+                    tempDic.Add("Description", item.Description);
+                    tempDic.Add("URL", item.Url);
 
                 }
                 else
                 {
-                    tempDic.Add(item.Id.ToString().Replace("System.", "").Replace(".", "") + "Id", (item.Id));
+                    tempDic.Add("TeamId",(item.Id));
 
-                    tempDic.Add(item.Name.ToString().Replace("System.", "").Replace(".", "") + "Name", (item.Name));
-
-                    tempDic.Add(item.ProjectName.ToString().Replace("System.", "").Replace(".", "") + "ProjectName", (item.ProjectName));
+                    
 
                 }
                 bsonDoc.AddRange(tempDic);
@@ -190,16 +191,18 @@ namespace CropsV4
             {
                 if (item.Name.GetType() != typeof(IdentityRef))
                 {
-                    tempDic.Add(item.Name.ToString().Replace("System", "").Replace(".", "IterationName"), item.Name);
-                    tempDic.Add(item.Path.ToString().Replace("System.", "").Replace(".", "Path") + "path", (item.Path));
-                    tempDic.Add(item.Links.ToString().Replace("System.", "").Replace(".", "Links") + "Links", (item.Links));
+                    tempDic.Add("IterationName",item.Name);
+                    tempDic.Add("IterationPath",item.Path);
+                    tempDic.Add("Links", item.Links);
+                  
+
 
                 }
                 else
                 {
-                    tempDic.Add(item.Id.ToString().Replace("System.", "").Replace(".", "") + "Id", (item.Id));
+                    tempDic.Add("IterationId",item.Id);
 
-                    tempDic.Add(item.Name.ToString().Replace("System.", "").Replace(".", "") + "Name", (item.Name));
+                    
 
                 }
                 bsonDoc.AddRange(tempDic);
@@ -212,16 +215,16 @@ namespace CropsV4
             {
                 if (item.Name.GetType() != typeof(IdentityRef))
                 {
-                    tempDic.Add(item.Name.ToString().Replace("System", "").Replace(".", "ProjectName"), item.Name);
-                    tempDic.Add(item.State.ToString().Replace("System", "").Replace(".", "State"), item.State);
-                    tempDic.Add(item.LastUpdateTime.ToString().Replace("System", "LastUpdatedDate").Replace(".", "LastUpdatedDate"), item.LastUpdateTime);
-                    tempDic.Add(item.Url.ToString().Replace("System", "URL").Replace(".", "URL"), item.Url);
+                    tempDic.Add("ProjectName", item.Name);
+                    tempDic.Add("State", item.State);
+                    tempDic.Add("LastUpdatedDate", item.LastUpdateTime);
+                    tempDic.Add("URL", item.Url);
                 }
                 else
                 {
-                    tempDic.Add(item.Id.ToString().Replace("System.", "").Replace(".", "") + "Id", (item.Id));
+                    tempDic.Add("ProjectId",item.Id);
 
-                 
+
 
                 }
                 bsonDoc.AddRange(tempDic);
@@ -229,7 +232,7 @@ namespace CropsV4
                 tempDic.Clear();
                 bsonDoc.Clear();
             }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             foreach (var item in workItems)
             {
                 foreach (var i in item.Fields)
@@ -252,36 +255,36 @@ namespace CropsV4
                 }
             }
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-                foreach (var item in workItemsHistory)
-                {
-                    foreach (var i in item.Fields)
-                    {
-                  
-
-                        if (i.Value.GetType() != typeof(IdentityRef))
-                            tempDic.Add(i.Key.ToString().Replace("System", "").Replace(".", ""), i.Value);
-                        else
-                        {
-                            tempDic.Add(i.Key.ToString().Replace("System.", "").Replace(".", "") + "Id", ((IdentityRef)i.Value).Id);
-
-                            tempDic.Add(i.Key.ToString().Replace("System.", "").Replace(".", "") + "DisplayName", ((IdentityRef)i.Value));
-
-                        }
-                    
-                    bsonDoc.AddRange(tempDic);
-
-                        BsonWorkItemsHistory.InsertOne(bsonDoc);
-
-                        tempDic.Clear();
-                        bsonDoc.Clear();
-                    }
-                
-                    Console.WriteLine("Done");
-
-                }
+            //foreach (var item in workItemsHistory)
+            //{
+            //    foreach (var i in item.Fields)
+            //    {
 
 
-            
+            //        if (i.Value.GetType() != typeof(IdentityRef))
+            //            tempDic.Add(i.Key.ToString().Replace("System", "").Replace(".", ""), i.Value);
+            //        else
+            //        {
+            //            tempDic.Add(i.Key.ToString().Replace("System.", "").Replace(".", "") + "Id", ((IdentityRef)i.Value).Id);
+
+            //            tempDic.Add(i.Key.ToString().Replace("System.", "").Replace(".", "") + "DisplayName", ((IdentityRef)i.Value));
+
+            //        }
+
+            //    bsonDoc.AddRange(tempDic);
+
+            //        BsonWorkItemsHistory.InsertOne(bsonDoc);
+
+            //        tempDic.Clear();
+            //        bsonDoc.Clear();
+            //    }
+
+            //    Console.WriteLine("Done");
+
+            //}
+
+
+
         }
     }
 }
